@@ -47,7 +47,7 @@ class TestSplitText(unittest.TestCase):
         print(result.to_html())
 
     def test_extract_codeblock(self):
-        result = split_markdown('```\n\tthis is a codeblock\n\tif a == b: return zeta\n\telse: return beta\n```')
+        result = split_markdown('```\nthis is a codeblock\nif a == b: return zeta\nelse: return beta\n```')
         print(result.to_html())
     
     def test_extract_blockquote(self):
@@ -55,25 +55,38 @@ class TestSplitText(unittest.TestCase):
         print(result.to_html())
     
     def test_common(self):
-        txt ='''
-        # Python for dummies\n\n
-        Let's make a simple python program from **scratch!**.\n\n
-        > Everything miraculous can be explained with calculus...\n
-        > Alan Duck\n\n
-        ## Requerements
+        txt =(
+'''# Python for dummies
 
-        1. python 3.10 installed somewhere on the pc
-        2. monitor
-        3. time plus strong nerves
+Let's make a simple python program from **scratch!**.
 
+> Everything miraculous can be explained with calculus...
+> Alan Duck
 
-        ## Steps (not in order)
+## Requerements
 
-        * open python.exe
-        * write ze code
-        * ???
-        * enjoy!
-        '''
+1. python 3.10 installed somewhere on the pc
+2. monitor
+3. time plus strong nerves
+
+## Steps (not in order)
+
+* open python.exe
+* write ze code
+* ???
+* enjoy!
+
+### Sample code (for beginners)
+
+```
+include <stdio.h>
+void main() {
+    printf("This is a pure Python code!\\n");
+}
+```
+
+''')
+
         result = split_markdown(txt)
         print(result.to_html())
 

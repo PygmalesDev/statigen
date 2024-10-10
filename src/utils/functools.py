@@ -5,7 +5,7 @@ from src.nodes.htmlnode import HTMLNode
 import re
 
 def split_markdown(text: str) -> ParentNode:
-    parents = list(map(lambda parag: tokenize_paragraph(parag), text.split("\n\n")))
+    parents = list(map(lambda parag: tokenize_paragraph(parag), re.split(r'\n\n+', text)))
     return ParentNode(tag="div", children=parents)
 
 def tokenize_paragraph(parag: str, parentag: str = 'p') -> HTMLNode: 
@@ -87,11 +87,11 @@ def get_raw_leaf(body:str, st_indx: int, end_indx: int = 0) -> LeafNode:
             else LeafNode(value=body[st_indx:]))
 
 def get_textblock(text: str) -> HTMLNode:
-    if re.search('^#+ .+$', text) is not None:
+    if re.search('^#+ .+$', text):
         header = len(re.findall('#+', text)[0])
         return LeafNode(value=text[header+1:], tag=f'h{header}')
 
-    if re.search('^\* .*', text) is not None:
+    if re.search('^\* .*', text):
         line_nodes = list(map(lambda line: LeafNode(tag='li', value=line.replace('\n', '')), text.split("* ")[1:]))
         return ParentNode(tag='ul', children=line_nodes)
 
@@ -100,9 +100,11 @@ def get_textblock(text: str) -> HTMLNode:
         return ParentNode(tag='ol', children=line_nodes)                  
 
     if re.search('^```.*```$', text, re.DOTALL):
-        return LeafNode(tag='code', value=text.replace('```', '')+'\t')
+        line_nodes = list(map(lambda line: LeafNode(value=line.replace('\n', '')), text.replace('```', '').split('\n')[1:-1]))
+        return ParentNode(tag='code', children=line_nodes)
 
-    if re.search('^> .+$', text, re.DOTALL) is not None:
-        return LeafNode(tag='blockquote', value='\n'+'\t'.join(text.split('> '))+'\n\t')
+    if re.search('^> .+$', text, re.DOTALL):
+        line_nodes = list(map(lambda line: LeafNode(value=line.replace('\n', '')), re.split('> ', text)[1:]))
+        return ParentNode(tag='blockquote', children=line_nodes)
 
     return None
