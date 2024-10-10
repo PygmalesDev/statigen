@@ -34,5 +34,48 @@ class TestSplitText(unittest.TestCase):
         result = split_markdown("This text **contains** ![image](https://imgs.org) - an image, and a link to a website: [link to a website](https://website.org)! So awesome")
         print(result.to_html())
 
+    def test_extract_header(self):
+        result = split_markdown('# This is a h1 header\n\n## This is a h2 header\n\n###This is not a header :(')
+        print(result.to_html())
+
+    def test_extract_ul(self):
+        result = split_markdown('* First line of an unordered list\n* Second line of a list\n* Third line\nPart of the third line')
+        print(result.to_html())
+    
+    def test_extract_op(self):
+        result = split_markdown('1. this text contains ordered list\n2. second line of the list\n3. third line of the list')
+        print(result.to_html())
+
+    def test_extract_codeblock(self):
+        result = split_markdown('```\n\tthis is a codeblock\n\tif a == b: return zeta\n\telse: return beta\n```')
+        print(result.to_html())
+    
+    def test_extract_blockquote(self):
+        result = split_markdown('> As one smart man said\n> This place is funky\n> Let us dance!')
+        print(result.to_html())
+    
+    def test_common(self):
+        txt ='''
+        # Python for dummies\n\n
+        Let's make a simple python program from **scratch!**.\n\n
+        > Everything miraculous can be explained with calculus...\n
+        > Alan Duck\n\n
+        ## Requerements
+
+        1. python 3.10 installed somewhere on the pc
+        2. monitor
+        3. time plus strong nerves
+
+
+        ## Steps (not in order)
+
+        * open python.exe
+        * write ze code
+        * ???
+        * enjoy!
+        '''
+        result = split_markdown(txt)
+        print(result.to_html())
+
 if __name__ == '__main__':
     unittest.main()
