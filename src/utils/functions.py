@@ -4,9 +4,9 @@ from src.nodes.htmlnode import HTMLNode
 
 import re
 
-def split_markdown(text: str) -> ParentNode:
+def convert_to_html(text: str) -> ParentNode:
     parents = list(map(lambda parag: tokenize_paragraph(parag), re.split(r'\n\n+', text)))
-    return ParentNode(tag="div", children=parents)
+    return wrap_head(ParentNode(tag="div", children=parents))
 
 def tokenize_paragraph(parag: str, parentag: str = 'p') -> HTMLNode: 
     textblock = get_textblock(parag)
@@ -82,9 +82,11 @@ def extract_link(text: str) -> (str, int):
         return LeafNode(tag=tg, value=val, props={"url": url}), end
     return None, None
 
+
 def get_raw_leaf(body:str, st_indx: int, end_indx: int = 0) -> LeafNode:
     return (LeafNode(value=body[st_indx:end_indx]) if end_indx != 0 
             else LeafNode(value=body[st_indx:]))
+
 
 def get_textblock(text: str) -> HTMLNode:
     if re.search('^#+ .+$', text):
@@ -100,11 +102,20 @@ def get_textblock(text: str) -> HTMLNode:
         return ParentNode(tag='ol', children=line_nodes)                  
 
     if re.search('^```.*```$', text, re.DOTALL):
-        line_nodes = list(map(lambda line: LeafNode(value=line.replace('\n', '')), text.replace('```', '').split('\n')[1:-1]))
+        line_nodes = list(map(lambda line: LeafNode(value=replace_symbols(line)+' <br>'), text.replace('```', '').split('\n')[1:-1]))
         return ParentNode(tag='code', children=line_nodes)
 
     if re.search('^> .+$', text, re.DOTALL):
-        line_nodes = list(map(lambda line: LeafNode(value=line.replace('\n', '')), re.split('> ', text)[1:]))
+        line_nodes = list(map(lambda line: LeafNode(value=line.replace('\n', ' <br>')), re.split('> ', text)[1:]))
         return ParentNode(tag='blockquote', children=line_nodes)
 
     return None
+
+
+def replace_symbols(text: str) -> str:
+    return text.replace('<', '&lt').replace('>', '&gt')
+
+
+def wrap_head(divider: ParentNode) -> ParentNode:
+        return ParentNode(tag='html', children=[ParentNode(tag='body', children=[divider])])
+
